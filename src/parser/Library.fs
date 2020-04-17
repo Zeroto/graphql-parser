@@ -21,19 +21,20 @@ type Field = {
 type AST =
   | Scalar of string
   | Type of string * Field list
+  | Enum of string * string list
 
 let isIdentifier c = isLetter c || isDigit c || c = '_'
+let identifierParser = many1Satisfy2 isLetter isIdentifier
 
-let scalarParser = skipStringCI "Scalar" >>. spaces >>. many1Satisfy2 isLetter isIdentifier |>> (Scalar >> Some)
+let scalarParser = skipStringCI "Scalar" >>. spaces >>. identifierParser |>> (Scalar >> Some)
 let commentParser () = skipChar '#' >>. skipRestOfLine true >>% None
-
 
 let fieldTypeParser, fieldTypeParserRef = createParserForwardedToRef<FieldType, unit>()
 let fieldTypeListParser = (skipChar '[' >>. fieldTypeParser .>> skipChar ']' |>> List)
-do fieldTypeParserRef := fieldTypeListParser <|> (many1Satisfy2 isLetter isIdentifier |>> FieldType.Type)
+do fieldTypeParserRef := fieldTypeListParser <|> (identifierParser |>> FieldType.Type)
 
 let parameterParser =
-  many1Satisfy2 isLetter isIdentifier
+  identifierParser
   .>> spaces
   .>> skipChar ':'
   .>> spaces
@@ -53,7 +54,7 @@ let parametersParser =
       | Some x -> x
 
 let typeFieldParser =
-  many1Satisfy2 isLetter isIdentifier
+  identifierParser
   .>> spaces
   .>>. parametersParser
   .>> spaces
@@ -62,23 +63,35 @@ let typeFieldParser =
   .>>. fieldTypeParser
   .>>. (opt (pchar '!') |>> Option.isSome)
   .>> spaces
-  .>>. (many (skipChar '@' >>. many1Satisfy2 isLetter isIdentifier .>> spaces))
+  .>>. (many (skipChar '@' >>. identifierParser .>> spaces))
   |>> (fun ((((a,d),b),c),e) -> {``type``= {name = a; ``type`` = b; required = c}; parameters = d; directives = e})
   
 let typeParser =
   skipStringCI "Type"
   >>. spaces 
-  >>. many1Satisfy2 isLetter isIdentifier 
+  >>. identifierParser 
   .>> spaces 
   .>> skipChar '{' 
   .>>. (many (spaces >>. ((typeFieldParser |>> Some) <|> commentParser()) .>> spaces) |>> List.choose id)
   .>> skipChar '}' 
   |>> (AST.Type >> Some)
 
+let enumParser =
+  skipStringCI "Enum"
+  >>. spaces
+  >>. identifierParser
+  .>> spaces
+  .>> skipChar '{'
+  .>> spaces
+  .>>. many (identifierParser .>> spaces)
+  .>> skipChar '}'
+  |>> (AST.Enum >> Some)
+
 let astValue = choice [
   scalarParser
   commentParser()
   typeParser
+  enumParser
 ]
 
 let schemaParser = many (spaces >>. astValue .>> spaces) .>> eof |>> List.choose id

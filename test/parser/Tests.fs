@@ -76,3 +76,11 @@ let ``Is able to parse types with fields with parameters`` () =
   ])]
   let result = parse data
   Assert.isEqual expected result
+
+[<Fact>]
+let ``Is able to parse enums`` () =
+  let data = System.IO.File.ReadAllText "data/enums.graphql"
+
+  let expected = Ok [AST.Enum ("Test", ["testValue1"; "testValue2"])]
+  let result = parse data
+  Assert.isEqual expected result

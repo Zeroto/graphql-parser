@@ -1,0 +1,4 @@
+enum Test {
+  testValue1
+  testValue2
+}

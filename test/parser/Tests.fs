@@ -51,7 +51,8 @@ let ``Is able to parse simple types`` () =
   let expected = Ok [
     AST.Type ("Test", [createSimpleField "field" "String" false])
     AST.Type ("Test2", [createSimpleField "field1" "String" false; createSimpleField "field2" "String" false])
-    AST.Type ("Test3", [createListField "listField" "String" false])
+    AST.Type ("Test3", [createListField "listField" (FieldType.Type "String") false])
+    AST.Type ("Test4", [createListField "listField" (FieldType.List (FieldType.Type "String")) false])
   ]
   let result = parse data
   Assert.isEqual expected result

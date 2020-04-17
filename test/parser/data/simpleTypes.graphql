@@ -10,3 +10,7 @@ type Test2 {
 type Test3 {
   listField: [String]
 }
+
+type Test4 {
+  listField: [[String]]
+}

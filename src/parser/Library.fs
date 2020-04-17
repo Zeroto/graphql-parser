@@ -4,7 +4,7 @@ open FParsec
 
 type FieldType =
   | Type of string
-  | List of string
+  | List of FieldType
 
 type Type = {
   name: string
@@ -27,9 +27,10 @@ let isIdentifier c = isLetter c || isDigit c || c = '_'
 let scalarParser = skipStringCI "Scalar" >>. spaces >>. many1Satisfy2 isLetter isIdentifier |>> (Scalar >> Some)
 let commentParser () = skipChar '#' >>. skipRestOfLine true >>% None
 
-let fieldTypeParser =
-  (skipChar '[' >>. many1Satisfy2 isLetter isIdentifier .>> skipChar ']' |>> List)
-  <|> (many1Satisfy2 isLetter isIdentifier |>> FieldType.Type)
+
+let fieldTypeParser, fieldTypeParserRef = createParserForwardedToRef<FieldType, unit>()
+let fieldTypeListParser = (skipChar '[' >>. fieldTypeParser .>> skipChar ']' |>> List)
+do fieldTypeParserRef := fieldTypeListParser <|> (many1Satisfy2 isLetter isIdentifier |>> FieldType.Type)
 
 let parameterParser =
   many1Satisfy2 isLetter isIdentifier

@@ -1,6 +1,7 @@
 ﻿module Graphql.Parser
 
 open FParsec
+open System.Text.RegularExpressions
 
 type FieldType =
   | Type of string
@@ -28,7 +29,6 @@ let isIdentifier c = isLetter c || isDigit c || c = '_'
 let identifierParser = many1Satisfy2 isLetter isIdentifier
 
 let scalarParser = skipStringCI "Scalar" >>. spaces >>. identifierParser |>> (Scalar >> Some)
-let commentParser () = skipChar '#' >>. skipRestOfLine true >>% None
 
 let fieldTypeParser, fieldTypeParserRef = createParserForwardedToRef<FieldType, unit>()
 let fieldTypeListParser = (skipChar '[' >>. fieldTypeParser .>> skipChar ']' |>> List)
@@ -74,7 +74,8 @@ let typeParser =
   .>> spaces
   .>>. (opt (skipStringCI "implements" >>. spaces >>. identifierParser .>> spaces))
   .>> skipChar '{' 
-  .>>. (many (spaces >>. ((typeFieldParser |>> Some) <|> commentParser()) .>> spaces) |>> List.choose id)
+  .>> spaces
+  .>>. many (typeFieldParser .>> spaces)
   .>> skipChar '}' 
   |>> (fun ((a,b),c) -> (AST.Type (a,b,c) |> Some))
 
@@ -85,7 +86,7 @@ let interfaceParser =
   .>> spaces 
   .>> skipChar '{' 
   .>> spaces
-  .>>. (many (((typeFieldParser |>> Some) <|> commentParser()) .>> spaces) |>> List.choose id)
+  .>>. many (typeFieldParser .>> spaces)
   .>> skipChar '}' 
   |>> (AST.Interface >> Some)
 
@@ -102,16 +103,21 @@ let enumParser =
 
 let astValue = choice [
   scalarParser
-  commentParser()
   typeParser
   enumParser
   interfaceParser
 ]
 
+let stripComments (s:string) =
+  let regex = Regex("#.*\n")
+  regex.Replace(s, "")
+
 let schemaParser = many (spaces >>. astValue .>> spaces) .>> eof |>> List.choose id
 
 let parse schema =
-  let result = run schemaParser schema
+  let result =
+    stripComments schema
+    |> run schemaParser 
   match result with
   | Success (r,_,_) ->
     Result.Ok r

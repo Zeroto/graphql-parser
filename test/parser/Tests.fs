@@ -4,6 +4,18 @@ open System
 open Xunit
 open Graphql.Parser
 
+
+let createParameter name ``type`` required =
+  {name=name; ``type``=FieldType.Type ``type``; required=required}
+let createSimpleField name ``type`` required =
+  {``type`` = {name=name; ``type``=FieldType.Type ``type``; required=required}; parameters=[]; directives=[]}
+let createListField name ``type`` required =
+  {``type`` = {name=name; ``type``=FieldType.List ``type``; required=required}; parameters=[]; directives=[]}
+let createFieldWithParameters name ``type`` required parameters =
+  {``type`` = {name=name; ``type``=FieldType.Type ``type``; required=required}; parameters=parameters; directives=[]}
+
+
+
 [<Fact>]
 let ``Is able to parse the example schema`` () =
   let data = System.IO.File.ReadAllText "data/example.graphql"
@@ -29,20 +41,10 @@ let ``Is able to parse scalars`` () =
 let ``Is able to parse comments and ignore them`` () =
   let data = System.IO.File.ReadAllText "data/comments.graphql"
 
-  let expected = Ok []
+  let expected = Ok [AST.Type ("Test", None, [createSimpleField "field" "String" false])]
   let result = parse data
   Assert.isEqual expected result
   ()
-
-let createParameter name ``type`` required =
-  {name=name; ``type``=FieldType.Type ``type``; required=required}
-let createSimpleField name ``type`` required =
-  {``type`` = {name=name; ``type``=FieldType.Type ``type``; required=required}; parameters=[]; directives=[]}
-let createListField name ``type`` required =
-  {``type`` = {name=name; ``type``=FieldType.List ``type``; required=required}; parameters=[]; directives=[]}
-let createFieldWithParameters name ``type`` required parameters =
-  {``type`` = {name=name; ``type``=FieldType.Type ``type``; required=required}; parameters=parameters; directives=[]}
-
 
 [<Fact>]
 let ``Is able to parse simple types`` () =

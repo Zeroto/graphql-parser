@@ -1,3 +1,8 @@
 # comment lines should be ignored
 
 # we can have multiple comment lines in a file
+
+type Test { # comments can also come after something else on a line
+  # and they can appear within other constructs
+  field: String
+}

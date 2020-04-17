@@ -1,0 +1,12 @@
+type Test {
+  field: String
+}
+
+type Test2 {
+  field1: String
+  field2: String
+}
+
+type Test3 {
+  listField: [String]
+}

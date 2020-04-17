@@ -1,0 +1,5 @@
+type Test {
+  field1(param1: String): String
+  field2(  param2: String! ): String
+  field3(param3: String, param4: String): String
+}

@@ -49,10 +49,10 @@ let ``Is able to parse simple types`` () =
   let data = System.IO.File.ReadAllText "data/simpleTypes.graphql"
 
   let expected = Ok [
-    AST.Type ("Test", [createSimpleField "field" "String" false])
-    AST.Type ("Test2", [createSimpleField "field1" "String" false; createSimpleField "field2" "String" false])
-    AST.Type ("Test3", [createListField "listField" (FieldType.Type "String") false])
-    AST.Type ("Test4", [createListField "listField" (FieldType.List (FieldType.Type "String")) false])
+    AST.Type ("Test", None, [createSimpleField "field" "String" false])
+    AST.Type ("Test2", None, [createSimpleField "field1" "String" false; createSimpleField "field2" "String" false])
+    AST.Type ("Test3", None, [createListField "listField" (FieldType.Type "String") false])
+    AST.Type ("Test4", None, [createListField "listField" (FieldType.List (FieldType.Type "String")) false])
   ]
   let result = parse data
   Assert.isEqual expected result
@@ -61,7 +61,7 @@ let ``Is able to parse simple types`` () =
 let ``Is able to parse types with required fields`` () =
   let data = System.IO.File.ReadAllText "data/requiredFields.graphql"
 
-  let expected = Ok [AST.Type ("Test", [createSimpleField "requiredField" "String" true])]
+  let expected = Ok [AST.Type ("Test", None, [createSimpleField "requiredField" "String" true])]
   let result = parse data
   Assert.isEqual expected result
 
@@ -69,7 +69,7 @@ let ``Is able to parse types with required fields`` () =
 let ``Is able to parse types with fields with parameters`` () =
   let data = System.IO.File.ReadAllText "data/parameterFields.graphql"
 
-  let expected = Ok [AST.Type ("Test", [
+  let expected = Ok [AST.Type ("Test", None, [
     createFieldWithParameters "field1" "String" false [createParameter "param1" "String" false]
     createFieldWithParameters "field2" "String" false [createParameter "param2" "String" true]
     createFieldWithParameters "field3" "String" false [createParameter "param3" "String" false; createParameter "param4" "String" false]
@@ -82,5 +82,16 @@ let ``Is able to parse enums`` () =
   let data = System.IO.File.ReadAllText "data/enums.graphql"
 
   let expected = Ok [AST.Enum ("Test", ["testValue1"; "testValue2"])]
+  let result = parse data
+  Assert.isEqual expected result
+
+[<Fact>]
+let ``Is able to parse interfaces`` () =
+  let data = System.IO.File.ReadAllText "data/interfaces.graphql"
+
+  let expected = Ok [
+    AST.Interface ("Test", [createSimpleField "field" "String" false])
+    AST.Type ("TestImpl", Some "Test", [createSimpleField "field" "String" false])
+  ]
   let result = parse data
   Assert.isEqual expected result

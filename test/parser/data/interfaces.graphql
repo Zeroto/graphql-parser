@@ -1,0 +1,7 @@
+interface Test {
+  field: String
+}
+
+type TestImpl implements Test {
+  field: String
+}

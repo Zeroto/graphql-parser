@@ -20,8 +20,9 @@ type Field = {
 
 type AST =
   | Scalar of string
-  | Type of string * Field list
+  | Type of string * string option * Field list
   | Enum of string * string list
+  | Interface of string * Field list
 
 let isIdentifier c = isLetter c || isDigit c || c = '_'
 let identifierParser = many1Satisfy2 isLetter isIdentifier
@@ -70,11 +71,23 @@ let typeParser =
   skipStringCI "Type"
   >>. spaces 
   >>. identifierParser 
-  .>> spaces 
+  .>> spaces
+  .>>. (opt (skipStringCI "implements" >>. spaces >>. identifierParser .>> spaces))
   .>> skipChar '{' 
   .>>. (many (spaces >>. ((typeFieldParser |>> Some) <|> commentParser()) .>> spaces) |>> List.choose id)
   .>> skipChar '}' 
-  |>> (AST.Type >> Some)
+  |>> (fun ((a,b),c) -> (AST.Type (a,b,c) |> Some))
+
+let interfaceParser =
+  skipStringCI "Interface"
+  >>. spaces 
+  >>. identifierParser 
+  .>> spaces 
+  .>> skipChar '{' 
+  .>> spaces
+  .>>. (many (((typeFieldParser |>> Some) <|> commentParser()) .>> spaces) |>> List.choose id)
+  .>> skipChar '}' 
+  |>> (AST.Interface >> Some)
 
 let enumParser =
   skipStringCI "Enum"
@@ -92,6 +105,7 @@ let astValue = choice [
   commentParser()
   typeParser
   enumParser
+  interfaceParser
 ]
 
 let schemaParser = many (spaces >>. astValue .>> spaces) .>> eof |>> List.choose id

@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{20B8E98B-5
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "parser", "test\parser\parser.tests.fsproj", "{1288A521-6E27-4B46-9243-791AFA980992}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "validator.tests", "test\validator\validator.tests.fsproj", "{7BD02D59-5337-4688-9160-757BB708682A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,9 +50,22 @@ Global
 		{1288A521-6E27-4B46-9243-791AFA980992}.Release|x64.Build.0 = Release|Any CPU
 		{1288A521-6E27-4B46-9243-791AFA980992}.Release|x86.ActiveCfg = Release|Any CPU
 		{1288A521-6E27-4B46-9243-791AFA980992}.Release|x86.Build.0 = Release|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Debug|x64.Build.0 = Debug|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Debug|x86.Build.0 = Debug|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Release|x64.ActiveCfg = Release|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Release|x64.Build.0 = Release|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Release|x86.ActiveCfg = Release|Any CPU
+		{7BD02D59-5337-4688-9160-757BB708682A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5D648CE2-333B-4480-B9C3-AA443AE5CEA3} = {4F5E3073-28C4-4F69-A8FD-756C2480AD48}
 		{1288A521-6E27-4B46-9243-791AFA980992} = {20B8E98B-5F9E-440B-8193-94C915565FC5}
+		{7BD02D59-5337-4688-9160-757BB708682A} = {20B8E98B-5F9E-440B-8193-94C915565FC5}
 	EndGlobalSection
 EndGlobal

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="Parser.fs" />
+    <Compile Include="Validator.fs" />
   </ItemGroup>
 
   <ItemGroup>

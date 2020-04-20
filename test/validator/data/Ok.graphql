@@ -1,0 +1,26 @@
+scalar String
+scalar Number
+
+enum TestEnum {
+  a
+  b
+  c
+}
+
+interface TestInterface {
+  TestInterface_field1: String
+  TestInterface_field2: [String]
+  TestInterface_field3: Number
+  TestInterface_field4: [Number]
+  TestInterface_field5: TestEnum
+  TestInterface_field6: [TestEnum]
+}
+
+type TestType {
+  TestType_field1: String
+  TestType_field2: [String]
+  TestType_field3: Number
+  TestType_field4: [Number]
+  TestType_field5: TestEnum
+  TestType_field6: [TestEnum]
+}

@@ -1,1 +1,2 @@
 scalar Test @type(name: Test)
+scalar Test2 @type(name: "Test")

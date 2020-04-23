@@ -104,6 +104,7 @@ let ``Is able to parse directives`` () =
 
   let expected = Ok [
     AST.Scalar ("Test", [("type", [("name","Test")])])
+    AST.Scalar ("Test2", [("type", [("name","Test")])])
   ]
   let result = parse data
   Assert.isEqual expected result

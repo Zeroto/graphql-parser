@@ -34,7 +34,7 @@ let identifierParser = many1Satisfy2 isLetter isIdentifier
 let valueParser =
   choice [
     identifierParser
-    skipChar '"' >>. charsTillString "\"" false 1000
+    skipChar '"' >>. charsTillString "\"" true 1000
   ]
 let keyValueParser =
   identifierParser

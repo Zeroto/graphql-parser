@@ -18,7 +18,7 @@ let ``returns Ok when all types are present`` () =
     |> Result.mapError List.singleton
     |> Result.bind validate
   
-  Assert.True((match result with | Ok () -> true | Error _ -> false), sprintf "Failed: %A" result)
+  Assert.True((match result with | Ok _ -> true | Error _ -> false), sprintf "Failed: %A" result)
 
 [<Fact>]
 let ``returns Error when not all types are present`` () =
@@ -29,4 +29,4 @@ let ``returns Error when not all types are present`` () =
     |> Result.mapError List.singleton
     |> Result.bind validate
 
-  Assert.False((match result with | Ok () -> true | Error _ -> false), sprintf "Failed: %A" result)
+  Assert.False((match result with | Ok _ -> true | Error _ -> false), sprintf "Failed: %A" result)

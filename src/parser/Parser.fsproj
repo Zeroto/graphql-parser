@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+
+    <PackageId>Graphql.Parser</PackageId>
+    <Version>0.0.2</Version>
+    <Authors>Sander Homan</Authors>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
   </PropertyGroup>
 
   <ItemGroup>

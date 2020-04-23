@@ -52,6 +52,6 @@ let validate (ast: AST list) =
     |> List.map (fun (typename, field, ``type``) -> sprintf "Unknown type %s for field %s in type %s" ``type`` field typename)
   
   if failures |> List.isEmpty then
-    Ok ()
+    Ok ast
   else
     Error failures

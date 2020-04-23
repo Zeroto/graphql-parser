@@ -11,7 +11,7 @@ let validate (ast: AST list) =
     ast
     |> List.map 
         (function
-        | AST.Scalar s -> s
+        | AST.Scalar (s, _) -> s
         | AST.Interface (n,_) -> n
         | AST.Type (n,_,_) -> n
         | AST.Enum (n,_) -> n

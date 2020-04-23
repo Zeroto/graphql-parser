@@ -19,8 +19,10 @@ type Field = {
   directives: string list
 }
 
+type Directive = (string * (string*string) list)
+
 type AST =
-  | Scalar of string
+  | Scalar of (string * Directive list)
   | Type of string * string option * Field list
   | Enum of string * string list
   | Interface of string * Field list
@@ -28,7 +30,32 @@ type AST =
 let isIdentifier c = isLetter c || isDigit c || c = '_'
 let identifierParser = many1Satisfy2 isLetter isIdentifier
 
-let scalarParser = skipStringCI "Scalar" >>. spaces >>. identifierParser |>> (Scalar >> Some)
+
+let valueParser =
+  choice [
+    identifierParser
+    skipChar '"' >>. charsTillString "\"" false 1000
+  ]
+let keyValueParser =
+  identifierParser
+  .>> spaces
+  .>> skipChar ':'
+  .>> spaces
+  .>>. valueParser
+let keyValuesParser =
+  sepBy keyValueParser (spaces >>. skipChar ',' >>. spaces)
+let directiveParser =
+  skipChar '@'
+  >>. identifierParser
+  .>>. (opt ( skipChar '(' >>. spaces >>. keyValuesParser .>> spaces .>> skipChar ')' ))
+  |>> (fun (a,b) -> a,b |> Option.defaultValue [])
+let scalarParser =
+  skipStringCI "Scalar"
+  >>. spaces
+  >>. identifierParser
+  .>> spaces
+  .>>. (many (directiveParser .>> spaces))
+  |>> (Scalar >> Some)
 
 let fieldTypeParser, fieldTypeParserRef = createParserForwardedToRef<FieldType, unit>()
 let fieldTypeListParser = (skipChar '[' >>. fieldTypeParser .>> skipChar ']' |>> List)

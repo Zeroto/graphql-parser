@@ -28,10 +28,10 @@ let ``Is able to parse scalars`` () =
   let data = System.IO.File.ReadAllText "data/scalar.graphql"
 
   let expected = Ok [
-    Scalar "Test"
-    Scalar "Test2"
-    Scalar "ScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongName"
-    Scalar "WithSpacesBehind"
+    Scalar ("Test",[])
+    Scalar ("Test2",[])
+    Scalar ("ScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongNameScalarWithALongName",[])
+    Scalar ("WithSpacesBehind",[])
   ]
   let result = parse data
   Assert.isEqual expected result
@@ -94,6 +94,16 @@ let ``Is able to parse interfaces`` () =
   let expected = Ok [
     AST.Interface ("Test", [createSimpleField "field" "String" false])
     AST.Type ("TestImpl", Some "Test", [createSimpleField "field" "String" false])
+  ]
+  let result = parse data
+  Assert.isEqual expected result
+
+[<Fact>]
+let ``Is able to parse directives`` () =
+  let data = System.IO.File.ReadAllText "data/directives.graphql"
+
+  let expected = Ok [
+    AST.Scalar ("Test", [("type", [("name","Test")])])
   ]
   let result = parse data
   Assert.isEqual expected result

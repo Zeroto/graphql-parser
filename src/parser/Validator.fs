@@ -9,12 +9,13 @@ let validate (ast: AST list) =
 
   let validTypeNames =
     ast
-    |> List.map 
+    |> List.choose 
         (function
-        | AST.Scalar (s, _) -> s
-        | AST.Interface (n,_) -> n
-        | AST.Type (n,_,_) -> n
-        | AST.Enum (n,_) -> n
+        | AST.Scalar (s, _) -> Some s
+        | AST.Interface (n,_) -> Some n
+        | AST.Type (n,_,_) -> Some n
+        | AST.Enum (n,_) -> Some n
+        | AST.Schema _ -> None
         )
   
   let rec getRootType =

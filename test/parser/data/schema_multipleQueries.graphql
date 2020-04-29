@@ -1,0 +1,5 @@
+schema {
+  query: String @directive
+  query: String @directive
+  mutation: String @directive
+} @directive

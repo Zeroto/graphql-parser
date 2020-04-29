@@ -108,3 +108,27 @@ let ``Is able to parse directives`` () =
   ]
   let result = parse data
   Assert.isEqual expected result
+
+[<Fact>]
+let ``Is able to parse schema`` () =
+  let data = System.IO.File.ReadAllText "data/schema.graphql"
+
+  let expected = Ok [
+    AST.Schema {query = Some (FieldType.Type "String", [("directive",[])]); mutation = Some (FieldType.Type "String", [("directive",[])]); directives = [("directive", [])]}
+  ]
+  let result = parse data
+  Assert.isEqual expected result
+
+[<Fact>]
+let ``returns an error when schema has more than one query`` () =
+  let data = System.IO.File.ReadAllText "data/schema_multipleQueries.graphql"
+
+  let succeeded = parse data |> function | Ok _ -> true | Error _ -> false
+  Assert.False(succeeded)
+
+[<Fact>]
+let ``returns an error when schema has more than one mutation`` () =
+  let data = System.IO.File.ReadAllText "data/schema_multipleMutations.graphql"
+
+  let succeeded = parse data |> function | Ok _ -> true | Error _ -> false
+  Assert.False(succeeded)

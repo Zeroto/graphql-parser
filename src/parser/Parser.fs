@@ -21,11 +21,18 @@ type Field = {
 
 type Directive = (string * (string*string) list)
 
+type Schema = {
+  query: (FieldType * Directive list) option
+  mutation: (FieldType * Directive list) option
+  directives: Directive list
+}
+
 type AST =
   | Scalar of (string * Directive list)
   | Type of string * string option * Field list
   | Enum of string * string list
   | Interface of string * Field list
+  | Schema of Schema
 
 let isIdentifier c = isLetter c || isDigit c || c = '_'
 let identifierParser = many1Satisfy2 isLetter isIdentifier
@@ -117,6 +124,53 @@ let interfaceParser =
   .>> skipChar '}' 
   |>> (AST.Interface >> Some)
 
+
+type SchemaFieldName =
+  | Query
+  | Mutation
+
+let schemaFieldNameParser =
+  choice [
+    skipStringCI "query" >>% Query
+    skipStringCI "mutation" >>% Mutation
+  ]
+let schemaFieldParser =
+  schemaFieldNameParser
+  .>> spaces
+  .>> skipChar ':'
+  .>> spaces
+  .>>. fieldTypeParser
+  .>> spaces
+  .>>. (many (directiveParser .>> spaces))
+
+let schemaTypeParser =
+  skipStringCI "Schema"
+  .>> spaces 
+  .>> skipChar '{' 
+  .>> spaces
+  >>. many (schemaFieldParser .>> spaces)
+  .>> skipChar '}' 
+  .>> spaces
+  .>>. many (directiveParser .>> spaces)
+  >>= fun (a,d) ->
+    let counts = a |> List.countBy (fun ((t,_),_) -> t)
+    let queryCount = counts |> List.tryFind (fun (x,_) -> x = Query) |> Option.map snd |> Option.defaultValue 0
+    let mutationCount = counts |> List.tryFind (fun (x,_) -> x = Mutation) |> Option.map snd |> Option.defaultValue 0
+    if queryCount <> 0 && queryCount <> 1 then
+      fun (_) -> Reply(ReplyStatus.FatalError, expected "0 or 1 query field in schema")
+    else if mutationCount <> 0 && mutationCount <> 1 then
+      fun (_) -> Reply(ReplyStatus.FatalError, expected "0 or 1 mutation field in schema")
+    else
+      let query = a |> List.tryFind (fun ((t,_),_) -> t = Query) //((_, queryType), queryDirectives)
+      let mutation = a |> List.tryFind (fun ((t,_),_) -> t = Mutation)
+
+      let schema = {
+        query = query |> Option.map (fun ((_, t), d) -> (t,d))
+        mutation = mutation |> Option.map (fun ((_, t), d) -> (t,d))
+        directives = d
+      }
+      preturn (AST.Schema schema |> Some)
+
 let enumParser =
   skipStringCI "Enum"
   >>. spaces
@@ -133,6 +187,7 @@ let astValue = choice [
   typeParser
   enumParser
   interfaceParser
+  schemaTypeParser
 ]
 
 let stripComments (s:string) =

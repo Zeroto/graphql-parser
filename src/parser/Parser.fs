@@ -7,6 +7,9 @@ type FieldType =
   | Type of string
   | List of FieldType
 
+
+type Directive = (string * (string*string) list)
+
 type Type = {
   name: string
   ``type``: FieldType
@@ -16,10 +19,8 @@ type Type = {
 type Field = {
   ``type``: Type
   parameters: Type list
-  directives: string list
+  directives: Directive list
 }
-
-type Directive = (string * (string*string) list)
 
 type Schema = {
   query: (FieldType * Directive list) option
@@ -98,7 +99,7 @@ let typeFieldParser =
   .>>. fieldTypeParser
   .>>. (opt (pchar '!') |>> Option.isSome)
   .>> spaces
-  .>>. (many (skipChar '@' >>. identifierParser .>> spaces))
+  .>>. (many (directiveParser .>> spaces))
   |>> (fun ((((a,d),b),c),e) -> {``type``= {name = a; ``type`` = b; required = c}; parameters = d; directives = e})
   
 let typeParser =

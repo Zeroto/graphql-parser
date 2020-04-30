@@ -1,2 +1,9 @@
 scalar Test @type(name: Test)
 scalar Test2 @type(name: "Test")
+
+type TestType {
+  field1: string! @directive
+  field2: string! @directive @directive
+  field3: string! @directive(withParam: Test)
+  field4: string! @directive(withParam: Test, withParam2: Test2)
+}

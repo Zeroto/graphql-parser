@@ -102,9 +102,26 @@ let ``Is able to parse interfaces`` () =
 let ``Is able to parse directives`` () =
   let data = System.IO.File.ReadAllText "data/directives.graphql"
 
+  let createFieldWithDirectives name ``type`` directives: Field =
+    {
+      ``type`` = {
+        name = name
+        ``type`` = FieldType.Type ``type``
+        required = true
+      }
+      parameters = []
+      directives = directives
+    }
+
   let expected = Ok [
     AST.Scalar ("Test", [("type", [("name","Test")])])
     AST.Scalar ("Test2", [("type", [("name","Test")])])
+    AST.Type ("TestType", None, [
+      createFieldWithDirectives "field1" "string" [("directive", [])]
+      createFieldWithDirectives "field2" "string" [("directive", []); ("directive", [])]
+      createFieldWithDirectives "field3" "string" [("directive", [("withParam", "Test")])]
+      createFieldWithDirectives "field4" "string" [("directive", [("withParam", "Test");("withParam2", "Test2")])]
+    ])
   ]
   let result = parse data
   Assert.isEqual expected result

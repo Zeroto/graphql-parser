@@ -112,18 +112,25 @@ let ``Is able to parse directives`` () =
     }
 
   let expected = Ok [
-    AST.Scalar ("Test", [("type", [("name","Test")])])
-    AST.Scalar ("Test2", [("type", [("name","Test")])])
+    AST.Scalar ("Test", [("type", [("name",Value.Identifier "Test")])])
+    AST.Scalar ("Test2", [("type", [("name",Value.String "Test")])])
     AST.Type ("TestType", None, [
       createFieldWithDirectives "field1" "string" [("directive", [])]
       createFieldWithDirectives "field2" "string" [("directive", []); ("directive", [])]
-      createFieldWithDirectives "field3" "string" [("directive", [("withParam", "Test")])]
-      createFieldWithDirectives "field4" "string" [("directive", [("withParam", "Test");("withParam2", "Test2")])]
+      createFieldWithDirectives "field3" "string" [("directive", [("withParam", Value.Identifier "Test")])]
+      createFieldWithDirectives "field4" "string" [("directive", [("withParam", Value.Identifier "Test");("withParam2", Value.Identifier "Test2")])]
       {
         name = "field5"
         ``type`` = FieldType.Type "string"
         required = true
         parameters = [{name="testParam"; ``type``=FieldType.Type "string"; required=false; directives=[("paramDirective",[])]}]
+        directives = []
+      }
+      {
+        name = "field6"
+        ``type`` = FieldType.Type "string"
+        required = true
+        parameters = [{name="testParam"; ``type``=FieldType.Type "string"; required=false; directives=[("paramDirective",[("value", Value.Number "10")])]}]
         directives = []
       }
     ])

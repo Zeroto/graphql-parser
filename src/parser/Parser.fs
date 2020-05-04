@@ -7,8 +7,12 @@ type FieldType =
   | Type of string
   | List of FieldType
 
+type Value =
+  | Identifier of string
+  | String of string
+  | Number of string
 
-type Directive = (string * (string*string) list)
+type Directive = (string * (string*Value) list)
 
 type Type = {
   name: string
@@ -42,10 +46,12 @@ let isIdentifier c = isLetter c || isDigit c || c = '_'
 let identifierParser = many1Satisfy2 isLetter isIdentifier
 
 
+
 let valueParser =
   choice [
-    identifierParser
-    skipChar '"' >>. charsTillString "\"" true 1000
+    identifierParser |>> Identifier
+    skipChar '"' >>. charsTillString "\"" true 1000 |>> String
+    many1Satisfy isDigit |>> Number
   ]
 let keyValueParser =
   identifierParser

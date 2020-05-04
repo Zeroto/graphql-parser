@@ -7,4 +7,5 @@ type TestType {
   field3: string! @directive(withParam: Test)
   field4: string! @directive(withParam: Test, withParam2: Test2)
   field5(testParam: string @paramDirective): string!
+  field6(testParam: string @paramDirective(value: 10)): string!
 }

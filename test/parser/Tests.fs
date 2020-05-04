@@ -6,13 +6,13 @@ open Graphql.Parser
 
 
 let createParameter name ``type`` required =
-  {name=name; ``type``=FieldType.Type ``type``; required=required}
+  {name=name; ``type``=FieldType.Type ``type``; required=required; directives=[]}
 let createSimpleField name ``type`` required =
-  {``type`` = {name=name; ``type``=FieldType.Type ``type``; required=required}; parameters=[]; directives=[]}
+  {name=name; ``type``=FieldType.Type ``type``; required=required; parameters=[]; directives=[]}
 let createListField name ``type`` required =
-  {``type`` = {name=name; ``type``=FieldType.List ``type``; required=required}; parameters=[]; directives=[]}
+  {name=name; ``type``=FieldType.List ``type``; required=required; parameters=[]; directives=[]}
 let createFieldWithParameters name ``type`` required parameters =
-  {``type`` = {name=name; ``type``=FieldType.Type ``type``; required=required}; parameters=parameters; directives=[]}
+  {name=name; ``type``=FieldType.Type ``type``; required=required; parameters=parameters; directives=[]}
 
 
 
@@ -104,11 +104,9 @@ let ``Is able to parse directives`` () =
 
   let createFieldWithDirectives name ``type`` directives: Field =
     {
-      ``type`` = {
-        name = name
-        ``type`` = FieldType.Type ``type``
-        required = true
-      }
+      name = name
+      ``type`` = FieldType.Type ``type``
+      required = true
       parameters = []
       directives = directives
     }
@@ -121,6 +119,13 @@ let ``Is able to parse directives`` () =
       createFieldWithDirectives "field2" "string" [("directive", []); ("directive", [])]
       createFieldWithDirectives "field3" "string" [("directive", [("withParam", "Test")])]
       createFieldWithDirectives "field4" "string" [("directive", [("withParam", "Test");("withParam2", "Test2")])]
+      {
+        name = "field5"
+        ``type`` = FieldType.Type "string"
+        required = true
+        parameters = [{name="testParam"; ``type``=FieldType.Type "string"; required=false; directives=[("paramDirective",[])]}]
+        directives = []
+      }
     ])
   ]
   let result = parse data

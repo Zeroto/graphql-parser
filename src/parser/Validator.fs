@@ -29,10 +29,10 @@ let validate (ast: AST list) =
       let failed =
         fields
         |> List.filter (fun f -> 
-          let t = f.``type``.``type`` |> getRootType
+          let t = f.``type`` |> getRootType
           not <| List.contains t validTypeNames
         )
-      failed |> List.map (fun s -> (n,s.``type``.name, s.``type``.``type`` |> getRootType))
+      failed |> List.map (fun s -> (n,s.name, s.``type`` |> getRootType))
     )
 
   let failedTypes =
@@ -41,10 +41,10 @@ let validate (ast: AST list) =
       let failed =
         fields
         |> List.filter (fun f -> 
-          let t = f.``type``.``type`` |> getRootType
+          let t = f.``type`` |> getRootType
           not <| List.contains t validTypeNames
         )
-      failed |> List.map (fun s -> (n,s.``type``.name, s.``type``.``type`` |> getRootType))
+      failed |> List.map (fun s -> (n,s.name, s.``type`` |> getRootType))
     )
 
   let failures =

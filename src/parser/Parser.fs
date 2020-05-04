@@ -14,10 +14,13 @@ type Type = {
   name: string
   ``type``: FieldType
   required: bool
+  directives: Directive list
 }
 
 type Field = {
-  ``type``: Type
+  name: string
+  ``type``: FieldType
+  required: bool
   parameters: Type list
   directives: Directive list
 }
@@ -75,8 +78,10 @@ let parameterParser =
   .>> skipChar ':'
   .>> spaces
   .>>. fieldTypeParser
-  .>>. (opt (pchar '!') |>> Option.isSome) 
-  |>> (fun ((a,b),c) -> {name = a; ``type`` = b; required = c})
+  .>>. (opt (pchar '!') |>> Option.isSome)
+  .>> spaces
+  .>>. (many (directiveParser .>> spaces))
+  |>> (fun (((a,b),c),d) -> {name = a; ``type`` = b; required = c; directives = d})
 
 let parametersParser =
   opt (
@@ -100,7 +105,7 @@ let typeFieldParser =
   .>>. (opt (pchar '!') |>> Option.isSome)
   .>> spaces
   .>>. (many (directiveParser .>> spaces))
-  |>> (fun ((((a,d),b),c),e) -> {``type``= {name = a; ``type`` = b; required = c}; parameters = d; directives = e})
+  |>> (fun ((((a,d),b),c),e) -> {name = a; ``type`` = b; required = c; parameters = d; directives = e})
   
 let typeParser =
   skipStringCI "Type"
